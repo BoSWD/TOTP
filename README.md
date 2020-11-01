@@ -7,12 +7,17 @@ This is an educational microservice that implements a basic TOTP 2fa logic, made
 
 ```uvicorn main:app --reload```
 
-Note: you need `uvicorn` installed globally to run it this way.
+Note: you need `uvicorn` installed to run it this way.
+
+Also you can use swagger client to interact with API:
+```http://127.0.0.1:8000/docs```
 
 ## Testing
 
-TOTP module unit tests and microservice tests:
+TOTP module contains unit tests and microservice tests:
 
-```pytest```
+```
+pytest
+```
 
-Note: you need `pytest` installed globally to run it in this way.
+Note: you need `pytest` installed to run it in this way.
