@@ -10,6 +10,7 @@ from users import users
 class User(BaseModel):
     user_id: str
     totp_secret: str
+    code: str
     misses_since_success: int = 0
 
 
@@ -31,7 +32,11 @@ def create_user(user_id: str):
     """Try to create new user; replies with new user object along with a secret, or appropriate error"""
     if user_id in users:
         raise HTTPException(status_code=409, detail="User '{}' already exists".format(user_id))
-    user = User(user_id=user_id, totp_secret=generate_secret())
+    
+    # TODO: Код действует time_window
+    
+    code = str(int(time()) // time_window)[-4:]
+    user = User(user_id=user_id, totp_secret=generate_secret(), code=code)
     users[user_id] = user
     return user
 
