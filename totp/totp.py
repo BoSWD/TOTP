@@ -1,6 +1,7 @@
-import string
+# import string
 import secrets
-from base58 import b58encode
+import base58
+from blake3 import blake3
 
 import time
 from typing import Optional
@@ -12,16 +13,14 @@ time_window = 15
 
 
 def generate_secret() -> str:
-    """Returns a random 20-symbol base58 string"""  
-    alphabet = string.ascii_letters + string.digits
-    tra_alphabet = alphabet.translate({ord(c): '' for c in "0OlI"})
-    print(tra_alphabet)
-    secret = secrets.token_bytes()
-    secret = ''.join(secrets.choice(alphabet) for i in range(14))
-    return str(b58encode(secret).decode("utf-8")) + str(int(time.time_ns()) % 9)
+    """Returns a random 20-symbol base58 string"""
+    # alphabet = (string.ascii_letters + string.digits).translate({ord(c): '' for c in "0OlI"})
+    # secret = ''.join(secrets.choice(alphabet) for i in range(20))
 
+    alphabet = secrets.token_bytes(30)
+    secret = base58.b58encode(alphabet).decode('utf-8')[:20]
 
-print(generate_secret())
+    return secret
 
 # def generate_secret() -> str:
 #     """Returns a random 20-symbol base58 string"""
@@ -42,14 +41,10 @@ def generate_code(secret: str,
 
     if seconds_since_the_epoch is None:
         seconds_since_the_epoch = int(time.time())
-        # seconds_since_the_epoch = 9999
+
     seconds_since_the_epoch = int(seconds_since_the_epoch // time_window)
 
     code = str(seconds_since_the_epoch)[-4:]
-
-    # code = seconds_since_the_epoch
-    # print(code)
-
     return code
 
 
@@ -65,5 +60,6 @@ def check_code(secret: str, code: str,
     """
     if len(code) != 4:
         raise ValueError("TOTP code must be 4 digits string, is '{}' instead".format(code))
-    # seconds_since_the_epoch = '9999'
-    return generate_code(secret, seconds_since_the_epoch) == code
+
+    return blake3(generate_code(secret, seconds_since_the_epoch).encode('utf-8')).digest() == blake3(code.encode('utf-8')).digest()
+    # return generate_code(secret, seconds_since_the_epoch) == code

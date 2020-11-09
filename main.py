@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 from time import time
 
+from blake3 import blake3
+
 from fastapi import FastAPI, HTTPException
 
-from totp import generate_secret, check_code, time_window
+from totp import generate_secret, check_code, time_window, generate_code
 from users import users
 
 
@@ -33,10 +35,9 @@ def create_user(user_id: str):
     if user_id in users:
         raise HTTPException(status_code=409, detail="User '{}' already exists".format(user_id))
     
-    # TODO: Код действует time_window. Удалить
-    
-    code = str(int(time()) // time_window)[-4:]
-    user = User(user_id=user_id, totp_secret=generate_secret(), code=code)
+    secret = generate_secret()
+    code = generate_code(secret)
+    user = User(user_id=user_id, totp_secret=secret, code=code)
     users[user_id] = user
     return user
 
