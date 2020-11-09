@@ -12,12 +12,16 @@ time_window = 15
 
 
 def generate_secret() -> str:
-    """Returns a random 20-symbol base58 string"""
+    """Returns a random 20-symbol base58 string"""  
     alphabet = string.ascii_letters + string.digits
+    tra_alphabet = alphabet.translate({ord(c): '' for c in "0OlI"})
+    print(tra_alphabet)
+    secret = secrets.token_bytes()
     secret = ''.join(secrets.choice(alphabet) for i in range(14))
     return str(b58encode(secret).decode("utf-8")) + str(int(time.time_ns()) % 9)
 
-# print(generate_secret())
+
+print(generate_secret())
 
 # def generate_secret() -> str:
 #     """Returns a random 20-symbol base58 string"""

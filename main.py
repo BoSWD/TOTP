@@ -33,7 +33,7 @@ def create_user(user_id: str):
     if user_id in users:
         raise HTTPException(status_code=409, detail="User '{}' already exists".format(user_id))
     
-    # TODO: Код действует time_window
+    # TODO: Код действует time_window. Удалить
     
     code = str(int(time()) // time_window)[-4:]
     user = User(user_id=user_id, totp_secret=generate_secret(), code=code)
