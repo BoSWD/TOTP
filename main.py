@@ -31,6 +31,7 @@ def create_user(user_id: str):
     """Try to create new user; replies with new user object along with a secret, or appropriate error"""
     if user_id in users:
         raise HTTPException(status_code=409, detail="User '{}' already exists".format(user_id))
+
     user = User(user_id=user_id, totp_secret=generate_secret())
     users[user_id] = user
     return user
