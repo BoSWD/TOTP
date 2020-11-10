@@ -17,7 +17,7 @@ def generate_secret() -> str:
     # alphabet = (string.ascii_letters + string.digits).translate({ord(c): '' for c in "0OlI"})
     # secret = ''.join(secrets.choice(alphabet) for i in range(20))
 
-    alphabet = secrets.token_bytes(30)
+    alphabet = secrets.token_bytes(15)
     secret = base58.b58encode(alphabet).decode('utf-8')[:20]
 
     return secret
@@ -43,8 +43,9 @@ def generate_code(secret: str,
         seconds_since_the_epoch = int(time.time())
 
     seconds_since_the_epoch = int(seconds_since_the_epoch // time_window)
+    hash_blk = blake3((secret + str(seconds_since_the_epoch)).encode('utf-8')).hexdigest()
+    code = str(int(hash_blk, 16))[-4:]
 
-    code = str(seconds_since_the_epoch)[-4:]
     return code
 
 
@@ -61,5 +62,4 @@ def check_code(secret: str, code: str,
     if len(code) != 4:
         raise ValueError("TOTP code must be 4 digits string, is '{}' instead".format(code))
 
-    return blake3(generate_code(secret, seconds_since_the_epoch).encode('utf-8')).digest() == blake3(code.encode('utf-8')).digest()
-    # return generate_code(secret, seconds_since_the_epoch) == code
+    return generate_code(secret, seconds_since_the_epoch) == code
